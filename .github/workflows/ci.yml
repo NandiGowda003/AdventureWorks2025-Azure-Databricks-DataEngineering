@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate repository structure
+        run: |
+          test -d adf
+          test -d databricks
+          test -d sql
+          test -d api
+          test -d powerbi
+          test -d docs
+          test -f README.md
+
+      - name: Validate project metadata
+        run: |
+          test -f sql/metadata/ETL_Metadata.sql
+          test -f api/frankfurter/README.md
+          test -f powerbi/README.md
+
+      - name: CI validation successful
+        run: echo "AdventureWorks project structure validated successfully."
