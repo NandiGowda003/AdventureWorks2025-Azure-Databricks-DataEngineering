@@ -8,20 +8,20 @@ The project demonstrates a modern Medallion Architecture with automated ingestio
 
 ## Architecture
 
-Local SQL Server + REST API
-        ↓
-Azure Data Factory
-        ↓
-ADLS Gen2 — Bronze
-        ↓
-Azure Databricks
-        ↓
-ADLS Gen2 — Silver
-        ↓
-Azure Databricks
-        ↓
-ADLS Gen2 — Gold
-        ↓
+Local SQL Server + REST API  
+↓  
+Azure Data Factory  
+↓  
+ADLS Gen2 — Bronze  
+↓  
+Azure Databricks  
+↓  
+ADLS Gen2 — Silver  
+↓  
+Azure Databricks  
+↓  
+ADLS Gen2 — Gold  
+↓  
 Power BI
 
 ## Data Sources
@@ -165,6 +165,8 @@ Fact-to-dimension orphan checks returned zero unmatched records.
 
 ```text
 AdventureWorks2025-Azure-Databricks-DataEngineering/
+├── .github/
+│   └── workflows/
 ├── adf/
 │   ├── pipelines/
 │   ├── datasets/
@@ -184,6 +186,7 @@ AdventureWorks2025-Azure-Databricks-DataEngineering/
 │   └── frankfurter/
 ├── powerbi/
 └── docs/
+```
 
 ## Development Workflow
 
@@ -194,3 +197,7 @@ The project follows a Git-based development workflow.
 - Feature branches can be created from `develop` for future development
 - Pull Requests are used to merge changes into `main`
 - GitHub Actions validates the repository structure on changes to `main`
+
+## Project Status
+
+Core data engineering pipeline, Gold analytics layer, Power BI dashboard, Git workflow, and CI validation completed.
