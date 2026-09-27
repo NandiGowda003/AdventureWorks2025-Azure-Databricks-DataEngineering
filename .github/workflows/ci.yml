@@ -16,7 +16,12 @@ jobs:
 
       - name: Validate repository structure
         run: |
-          test -d adf
+          test -d dataset
+          test -d factory
+          test -d integrationRuntime
+          test -d linkedService
+          test -d pipeline
+          test -d trigger
           test -d databricks
           test -d sql
           test -d api
