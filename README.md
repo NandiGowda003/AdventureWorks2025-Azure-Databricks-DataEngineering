@@ -184,3 +184,13 @@ AdventureWorks2025-Azure-Databricks-DataEngineering/
 │   └── frankfurter/
 ├── powerbi/
 └── docs/
+
+## Development Workflow
+
+The project follows a Git-based development workflow.
+
+- `main` — stable and portfolio-ready branch
+- `develop` — integration and testing branch
+- Feature branches can be created from `develop` for future development
+- Pull Requests are used to merge changes into `main`
+- GitHub Actions validates the repository structure on changes to `main`
