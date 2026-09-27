@@ -1,0 +1,48 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adf-adventureworks2025"
+		},
+		"LS_ADLS_AdventureWorks_accountKey": {
+			"value": ""
+		},
+		"LS_AzureSQL_Adventutrworks_password": {
+			"value": ""
+		},
+		"LS_LocalSQL_AdventureWorks_password": {
+			"value": ""
+		},
+		"LS_ADLS_AdventureWorks_properties_typeProperties_url": {
+			"value": "https://adventureworkstorageadls.dfs.core.windows.net/"
+		},
+		"LS_AzureSQL_Adventutrworks_properties_typeProperties_server": {
+			"value": "adventurework-sql-server.database.windows.net"
+		},
+		"LS_AzureSQL_Adventutrworks_properties_typeProperties_database": {
+			"value": "free-sql-db-2598144"
+		},
+		"LS_AzureSQL_Adventutrworks_properties_typeProperties_userName": {
+			"value": "avinashcg"
+		},
+		"LS_LocalSQL_AdventureWorks_properties_typeProperties_server": {
+			"value": "NANDIGOWDA\\SQLEXPRESS01"
+		},
+		"LS_LocalSQL_AdventureWorks_properties_typeProperties_database": {
+			"value": "AdventureWorksDW2025"
+		},
+		"LS_LocalSQL_AdventureWorks_properties_typeProperties_userName": {
+			"value": "avinashcg"
+		},
+		"LS_REST_Frankfurter_properties_typeProperties_url": {
+			"value": "https://api.frankfurter.app/"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}
