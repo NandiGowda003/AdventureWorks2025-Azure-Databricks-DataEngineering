@@ -212,3 +212,34 @@ AdventureWorks2025-Azure-Databricks-DataEngineering/
 
 ADF artifacts are managed through Azure Data Factory Git integration.
 
+## CI/CD
+
+GitHub Actions is used to validate the project repository.
+
+### Workflow
+
+- Changes are developed in the `develop` branch
+- Pull Requests are used to merge changes into `main`
+- GitHub Actions runs automatically on changes to `main`
+- CI validates the required project structure and key files
+- Successful validation ensures the repository is ready for deployment
+
+### CI Validation
+
+The workflow validates:
+
+- Required project folders
+- README.md
+- ADF project structure
+- SQL metadata
+- API documentation
+- Power BI documentation
+
+The CI workflow is defined in:
+
+`.github/workflows/ci.yml`
+
+Project Status
+
+Core ingestion, Silver and Gold transformations, SCD Type 2, Databricks orchestration, Power BI dashboard, ADF scheduling, Git workflow, and CI validation completed.
+
