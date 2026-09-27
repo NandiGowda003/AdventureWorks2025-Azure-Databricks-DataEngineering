@@ -212,6 +212,13 @@ AdventureWorks2025-Azure-Databricks-DataEngineering/
 
 ADF artifacts are managed through Azure Data Factory Git integration.
 
+## Development Workflow
+* main — stable and portfolio
+* develop — integration and testing
+* Pull Requests are used to merge changes into main
+* GitHub Actions validates repository structure
+* Azure Data Factory uses Git-based development and publishing
+
 ## CI/CD
 
 GitHub Actions is used to validate the project repository.
