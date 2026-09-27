@@ -1,0 +1,21 @@
+{
+	"name": "DS_ADLS_API_Bronze",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ADLS_AdventureWorks",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "frankfurter_usd_inr.json",
+				"folderPath": "API",
+				"fileSystem": "bronze"
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

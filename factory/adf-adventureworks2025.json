@@ -1,0 +1,15 @@
+{
+	"name": "adf-adventureworks2025",
+	"properties": {
+		"trustModeClaimForMi": {
+			"value": "Disabled",
+			"editable": true
+		}
+	},
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "37cbaffe-dcce-468c-8554-2fdd8d07c8cd",
+		"tenantId": "a72f6326-2235-4c2c-8d07-8583a31e8a3d"
+	}
+}

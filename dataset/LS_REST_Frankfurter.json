@@ -1,0 +1,19 @@
+{
+	"name": "LS_REST_Frankfurter",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_REST_Frankfurter",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "latest?from=USD&to=INR",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
