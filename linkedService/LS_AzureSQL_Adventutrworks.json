@@ -1,0 +1,17 @@
+{
+	"name": "LS_AzureSQL_Adventutrworks",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"server": "adventurework-sql-server.database.windows.net",
+			"database": "free-sql-db-2598144",
+			"encrypt": "mandatory",
+			"trustServerCertificate": true,
+			"authenticationType": "SQL",
+			"userName": "avinashcg",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQDczNjJFODQ4LURDQUYtNDBFRC04MjFELTI2MDhBNkZDMUMwRV8yYjYwYzBmMi1jMGUyLTQzY2QtYWQwYy0xMDE4OTM5YzJmMDUiDQp9"
+		}
+	}
+}

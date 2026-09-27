@@ -1,0 +1,17 @@
+{
+	"name": "DS_SQL_AdventureWorks",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_AzureSQL_Adventutrworks",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "DimProduct"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

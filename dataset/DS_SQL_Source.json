@@ -1,0 +1,25 @@
+{
+	"name": "DS_SQL_Source",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_LocalSQL_AdventureWorks",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"p_parm": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": {
+				"value": "@dataset().p_parm",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
