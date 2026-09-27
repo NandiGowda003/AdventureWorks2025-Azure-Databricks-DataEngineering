@@ -1,0 +1,18 @@
+resources:
+  jobs:
+    JOB_AdventureWorks2025_Pipeline:
+      name: JOB_AdventureWorks2025_Pipeline
+      tasks:
+        - task_key: Silver_Layer
+          notebook_task:
+            notebook_path: /Repos/avinashcg2@gmail.com/AdventureWorks2025-Azure-Databricks-DataEngineering/databricks/notebooks/NB_Bronze_to_Silver
+            source: WORKSPACE
+        - task_key: Gold_layer
+          depends_on:
+            - task_key: Silver_Layer
+          notebook_task:
+            notebook_path: /Repos/avinashcg2@gmail.com/AdventureWorks2025-Azure-Databricks-DataEngineering/databricks/notebooks/NB_Silver_to_Gold
+            source: WORKSPACE
+      queue:
+        enabled: true
+      performance_target: PERFORMANCE_OPTIMIZED
