@@ -4,7 +4,7 @@
 
 An end-to-end data engineering project built using Azure Data Factory, Azure Data Lake Storage Gen2, Azure Databricks, SQL Server, REST API, GitHub, and Power BI.
 
-The project demonstrates a modern Medallion Architecture with automated ingestion, data transformation, dimensional modeling, SCD Type 2, business KPIs, and analytics reporting.
+The project demonstrates Medallion Architecture, metadata-driven ingestion, data transformation, SCD Type 2, analytics, orchestration, and CI validation.
 
 ## Architecture
 
@@ -28,9 +28,7 @@ Power BI
 
 ### SQL Server
 
-AdventureWorksDW2025 from local SQL Server.
-
-Tables:
+AdventureWorksDW2025:
 
 - DimCustomer
 - DimProduct
@@ -40,36 +38,31 @@ Tables:
 
 ### REST API
 
-Frankfurter API is used as an external currency exchange-rate source.
-
-The API data is ingested into the Bronze layer and transformed through the data pipeline.
+Frankfurter API provides external currency exchange-rate data.
 
 ## Medallion Architecture
 
-### Bronze Layer
+### Bronze
 
-Raw data ingestion using Azure Data Factory.
+Azure Data Factory ingests:
 
-SQL Server tables are dynamically copied to ADLS Gen2 using a metadata-driven ADF pipeline.
+- SQL Server data using a metadata-driven pipeline
+- REST API data through a separate API pipeline
 
-REST API data is also ingested into the Bronze layer.
+### Silver
 
-### Silver Layer
-
-Azure Databricks and PySpark are used for:
+Azure Databricks and PySpark perform:
 
 - Data cleansing
 - Data type standardization
 - Null handling
 - Column selection
 - Business transformations
-- API data transformation
+- API transformation
 
-### Gold Layer
+### Gold
 
-Business-ready dimensional and fact datasets are created for analytics.
-
-Gold datasets include:
+Business-ready datasets:
 
 - DimCustomer
 - DimProduct
@@ -80,21 +73,21 @@ Gold datasets include:
 
 ## SCD Type 2
 
-SCD Type 2 metadata has been implemented for selected dimensions:
+SCD Type 2 metadata is implemented for:
 
 - DimCustomer
 - DimProduct
 - DimGeography
 
-The Gold dimensions include:
+Columns include:
 
 - EffectiveStartDate
 - EffectiveEndDate
 - IsCurrent
 
-## Gold Analytics
+## Analytics
 
-Business KPIs and analytical datasets include:
+Business metrics include:
 
 - Total Sales
 - Total Quantity
@@ -112,9 +105,9 @@ Business KPIs and analytical datasets include:
 
 ## Power BI Dashboard
 
-The Gold layer is consumed by Power BI for interactive analytics.
+The Gold layer is consumed by Power BI.
 
-Dashboard components include:
+Dashboard includes:
 
 - Total Sales
 - Total Orders
@@ -122,22 +115,45 @@ Dashboard components include:
 - Average Order Value
 - Sales Trend by Year
 - Sales by Product Line
-- Top 10 Products by Sales
-- Top 10 Customers by Sales
-- Top 10 Cities by Sales
+- Top 10 Products
+- Top 10 Customers
+- Top 10 Cities
 - Sales by State/Province
 - Sales by Month
 
-Interactive slicers are available for:
+Filters:
 
 - Year
 - Product Line
 - Country
 - State/Province
 
+## Orchestration
+
+### Azure Data Factory
+
+- Metadata-driven SQL ingestion pipeline
+- REST API ingestion pipeline
+- Daily SQL Bronze schedule trigger
+- API pipeline remains manually triggered
+
+### Azure Databricks
+
+Job:
+
+`JOB_AdventureWorks2025_Pipeline`
+
+Tasks:
+
+`Silver_Layer → Gold_Layer`
+
+Gold execution depends on successful completion of Silver.
+
+The Databricks job is currently configured for manual execution.
+
 ## Data Validation
 
-Gold layer validation was performed for:
+Validation includes:
 
 - Row counts
 - Dimension integrity
@@ -161,43 +177,38 @@ Fact-to-dimension orphan checks returned zero unmatched records.
 - GitHub
 - GitHub Actions
 
+## Key Project Highlights
+
+- Metadata-driven SQL ingestion using Azure Data Factory
+- REST API ingestion using Azure Data Factory
+- Azure Data Lake Storage Gen2 Medallion Architecture
+- PySpark-based Silver and Gold transformations
+- SCD Type 2 implementation for selected dimensions
+- Databricks Job orchestration for Silver → Gold processing
+- Daily scheduled SQL Bronze ingestion
+- Power BI dimensional model and interactive dashboard
+- Git-based development using `main` and `develop`
+- GitHub Actions CI validation
+
 ## Repository Structure
 
 ```text
 AdventureWorks2025-Azure-Databricks-DataEngineering/
 ├── .github/
 │   └── workflows/
-├── adf/
-│   ├── pipelines/
-│   ├── datasets/
-│   ├── linked-services/
-│   └── triggers/
-├── databricks/
-│   ├── notebooks/
-│   ├── jobs/
-│   └── config/
-├── sql/
-│   ├── metadata/
-│   ├── bronze/
-│   ├── silver/
-│   ├── gold/
-│   └── procedures/
 ├── api/
 │   └── frankfurter/
+├── databricks/
+├── dataset/
+├── docs/
+├── factory/
+├── integrationRuntime/
+├── linkedService/
+├── pipeline/
 ├── powerbi/
-└── docs/
+├── sql/
+└── trigger/
 ```
 
-## Development Workflow
+ADF artifacts are managed through Azure Data Factory Git integration.
 
-The project follows a Git-based development workflow.
-
-- `main` — stable and portfolio-ready branch
-- `develop` — integration and testing branch
-- Feature branches can be created from `develop` for future development
-- Pull Requests are used to merge changes into `main`
-- GitHub Actions validates the repository structure on changes to `main`
-
-## Project Status
-
-Core data engineering pipeline, Gold analytics layer, Power BI dashboard, Git workflow, and CI validation completed.
