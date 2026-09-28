@@ -6,6 +6,9 @@ An end-to-end data engineering project built using Azure Data Factory, Azure Dat
 
 The project demonstrates Medallion Architecture, metadata-driven ingestion, data transformation, SCD Type 2, analytics, orchestration, and CI validation.
 
+## Project Planning in Notion Step By Step
+https://app.notion.com/p/End-To-End-Pipeline-AdventureWorks2025-Azure-Data-bricks-3e4dd07fdfd0803db744c1da8e141bbd?source=copy_link
+
 ## Architecture
 
 Local SQL Server + REST API  
@@ -176,6 +179,7 @@ Fact-to-dimension orphan checks returned zero unmatched records.
 - Git
 - GitHub
 - GitHub Actions
+- NOTION
 
 ## Key Project Highlights
 
