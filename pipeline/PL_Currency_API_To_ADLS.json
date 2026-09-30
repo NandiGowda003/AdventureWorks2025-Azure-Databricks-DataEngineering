@@ -1,0 +1,60 @@
+{
+	"name": "PL_Currency_API_To_ADLS",
+	"properties": {
+		"activities": [
+			{
+				"name": "CP_Currency_API_To_ADLS",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET"
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
+					},
+					"sink": {
+						"type": "JsonSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "JsonWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_HTTP_Frankfurter",
+						"type": "DatasetReference",
+						"parameters": {
+							"pRelativeUrl": "/v2/rates?from=2026-01-01&to=2026-08-05&base=USD&quotes=INR"
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_ADLS_Currency_JSON",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2026-09-30T08:01:22Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

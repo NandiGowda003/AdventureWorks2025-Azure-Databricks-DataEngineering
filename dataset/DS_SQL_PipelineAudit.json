@@ -1,0 +1,76 @@
+{
+	"name": "DS_SQL_PipelineAudit",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_AzureSQL_Control",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "AuditID",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "PipelineName",
+				"type": "varchar"
+			},
+			{
+				"name": "PipelineRunID",
+				"type": "varchar"
+			},
+			{
+				"name": "SourceSystem",
+				"type": "varchar"
+			},
+			{
+				"name": "DatasetName",
+				"type": "varchar"
+			},
+			{
+				"name": "StartTime",
+				"type": "datetime2",
+				"scale": 3
+			},
+			{
+				"name": "EndTime",
+				"type": "datetime2",
+				"scale": 3
+			},
+			{
+				"name": "Status",
+				"type": "varchar"
+			},
+			{
+				"name": "RecordsRead",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "RecordsWritten",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "ErrorMessage",
+				"type": "nvarchar"
+			},
+			{
+				"name": "TriggerType",
+				"type": "varchar"
+			},
+			{
+				"name": "CreatedAt",
+				"type": "datetime2",
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "etl",
+			"table": "PipelineAudit"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

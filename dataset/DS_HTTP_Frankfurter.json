@@ -1,0 +1,28 @@
+{
+	"name": "DS_HTTP_Frankfurter",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_HTTP_Frankfurter",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"pRelativeUrl": {
+				"type": "string",
+				"defaultValue": "/v2/rates?from=2026-01-01&to=2026-08-05&base=USD&quotes=INR"
+			}
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": {
+					"value": "@dataset().pRelativeUrl",
+					"type": "Expression"
+				}
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

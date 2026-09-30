@@ -1,0 +1,580 @@
+{
+	"name": "PL_NYC_Taxi_Incremental",
+	"properties": {
+		"activities": [
+			{
+				"name": "LK_Get_Watermark",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "SP_Start_Audit",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DS_SQL_Watermark",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "LK_Get_Next_Pending",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "LK_Get_Watermark",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "SELECT TOP 1\n    ControlID,\n    [Year],\n    [Month],\n    FileName,\n    SourceURL,\n    Status\nFROM etl.IngestionControl\nWHERE Status IN ('Pending', 'Failed')\nORDER BY [Year], [Month];",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DS_SQL_IngestionControl",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "IF_Work_Available",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "LK_Get_Next_Pending",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@greater(activity('LK_Get_Next_Pending').output.count, 0)",
+						"type": "Expression"
+					},
+					"ifTrueActivities": [
+						{
+							"name": "SP_Mark_Processing",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[etl].[usp_MarkIngestionProcessing]",
+								"storedProcedureParameters": {
+									"ControlID": {
+										"value": {
+											"value": "@activity('LK_Get_Next_Pending').output.value[0].ControlID",
+											"type": "Expression"
+										},
+										"type": "Int64"
+									},
+									"PipelineRunID": {
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "LS_AzureSQL_Control",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "CP_TLC_To_Bronze",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "SP_Mark_Processing",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "ParquetSource",
+									"storeSettings": {
+										"type": "HttpReadSettings",
+										"requestMethod": "GET"
+									},
+									"formatSettings": {
+										"type": "ParquetReadSettings"
+									}
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "ParquetWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "DS_HTTP_NYC_TLC_Parquet",
+									"type": "DatasetReference",
+									"parameters": {
+										"pRelativeUrl": {
+											"value": "@replace(\n    activity('LK_Get_Next_Pending').output.value[0].SourceURL,\n    'https://d37ci6vzurychx.cloudfront.net',\n    ''\n)",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_ADLS_Bronze_NYC_TLC",
+									"type": "DatasetReference",
+									"parameters": {
+										"pYear": {
+											"value": "@string(activity('LK_Get_Next_Pending').output.value[0].Year)",
+											"type": "Expression"
+										},
+										"pMonth": {
+											"value": "@if(\n    less(activity('LK_Get_Next_Pending').output.value[0].Month, 10),\n    concat(\n        '0',\n        string(activity('LK_Get_Next_Pending').output.value[0].Month)\n    ),\n    string(activity('LK_Get_Next_Pending').output.value[0].Month)\n)",
+											"type": "Expression"
+										},
+										"pFileName": {
+											"value": "@activity('LK_Get_Next_Pending').output.value[0].FileName",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "SP_Mark_Success",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "DBX_Gold_Incremental",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[etl].[usp_MarkIngestionSuccess]",
+								"storedProcedureParameters": {
+									"ControlID": {
+										"value": {
+											"value": "@activity('LK_Get_Next_Pending').output.value[0].ControlID",
+											"type": "Expression"
+										},
+										"type": "Int64"
+									},
+									"RowCount": {
+										"value": null,
+										"type": "Int64"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "LS_AzureSQL_Control",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "SP_Mark_Failed",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "SP_Mark_Success",
+									"dependencyConditions": [
+										"Failed"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[etl].[usp_MarkIngestionFailed]",
+								"storedProcedureParameters": {
+									"ControlID": {
+										"value": {
+											"value": "@activity('LK_Get_Next_Pending').output.value[0].ControlID",
+											"type": "Expression"
+										},
+										"type": "Int64"
+									},
+									"ErrorMessage": {
+										"value": {
+											"value": "@string(activity('CP_TLC_To_Bronze').error)",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "LS_AzureSQL_Control",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "SP_Update_Watermark",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "SP_Mark_Success",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[etl].[usp_UpdateWatermark]",
+								"storedProcedureParameters": {
+									"DatasetName": {
+										"value": {
+											"value": "Yellow Taxi",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"LastProcessedValue": {
+										"value": {
+											"value": "@concat(\n    string(activity('LK_Get_Next_Pending').output.value[0].Year),\n    '-',\n    if(\n        less(activity('LK_Get_Next_Pending').output.value[0].Month, 10),\n        concat(\n            '0',\n            string(activity('LK_Get_Next_Pending').output.value[0].Month)\n        ),\n        string(activity('LK_Get_Next_Pending').output.value[0].Month)\n    )\n)",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"PipelineName": {
+										"value": {
+											"value": "@pipeline().Pipeline",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "LS_AzureSQL_Control",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "SP_Complete_Audit_Success",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "SP_Update_Watermark",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[etl].[usp_CompletePipelineAudit]",
+								"storedProcedureParameters": {
+									"ErrorMessage": {
+										"value": {
+											"value": "@string('')",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"PipelineRunID": {
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"Status": {
+										"value": {
+											"value": "Succeeded",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "LS_AzureSQL_Control",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "SP_Complete_Audit_Failed",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "SP_Mark_Failed",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[etl].[usp_CompletePipelineAudit]",
+								"storedProcedureParameters": {
+									"ErrorMessage": {
+										"value": {
+											"value": "@string(activity('SP_Mark_Success').error)",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"PipelineRunID": {
+										"value": {
+											"value": "@pipeline().RunId",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"Status": {
+										"value": {
+											"value": "Failed",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "LS_AzureSQL_Control",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "DBX_silver",
+							"type": "DatabricksJob",
+							"dependsOn": [
+								{
+									"activity": "CP_TLC_To_Bronze",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"jobId": "737797132331273",
+								"jobParameters": {
+									"year": {
+										"value": "@string(activity('LK_Get_Next_Pending').output.value[0].Year)",
+										"type": "Expression"
+									},
+									"month": {
+										"value": "@if(\n    less(activity('LK_Get_Next_Pending').output.value[0].Month, 10),\n    concat('0', string(activity('LK_Get_Next_Pending').output.value[0].Month)),\n    string(activity('LK_Get_Next_Pending').output.value[0].Month)\n)",
+										"type": "Expression"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "LS_AzureDatabricks_NYC_Taxi",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "DBX_Gold_Incremental",
+							"type": "DatabricksJob",
+							"dependsOn": [
+								{
+									"activity": "DBX_silver",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"jobId": "742446284039034",
+								"jobParameters": {
+									"year": {
+										"value": "@string(activity('LK_Get_Next_Pending').output.value[0].Year)",
+										"type": "Expression"
+									},
+									"month": {
+										"value": "@if(less(activity('LK_Get_Next_Pending').output.value[0].Month,10),concat('0',string(activity('LK_Get_Next_Pending').output.value[0].Month)),string(activity('LK_Get_Next_Pending').output.value[0].Month))",
+										"type": "Expression"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "LS_AzureDatabricks_NYC_Taxi",
+								"type": "LinkedServiceReference"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "SP_Start_Audit",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[etl].[usp_StartPipelineAudit]",
+					"storedProcedureParameters": {
+						"DatasetName": {
+							"value": {
+								"value": "'Yellow Taxi'",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"PipelineName": {
+							"value": {
+								"value": "@pipeline().Pipeline",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"PipelineRunID": {
+							"value": {
+								"value": "@pipeline().RunId",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"SourceSystem": {
+							"value": {
+								"value": "'NYC_TLC'",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TriggerType": {
+							"value": {
+								"value": "'Manual'",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "LS_AzureSQL_Control",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2026-09-30T11:34:04Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,39 @@
+{
+	"name": "DS_ADLS_Bronze_NYC_TLC",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ADLS_NYC_Taxi",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"pYear": {
+				"type": "string"
+			},
+			"pMonth": {
+				"type": "string"
+			},
+			"pFileName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@{dataset().pFileName}",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "yellow_taxi/@{dataset().pYear}/@{dataset().pMonth}",
+					"type": "Expression"
+				},
+				"fileSystem": "bronze"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

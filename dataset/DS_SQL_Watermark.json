@@ -1,0 +1,44 @@
+{
+	"name": "DS_SQL_Watermark",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_AzureSQL_Control",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "WatermarkID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "PipelineName",
+				"type": "varchar"
+			},
+			{
+				"name": "DatasetName",
+				"type": "varchar"
+			},
+			{
+				"name": "WatermarkColumn",
+				"type": "varchar"
+			},
+			{
+				"name": "LastProcessedValue",
+				"type": "varchar"
+			},
+			{
+				"name": "UpdatedAt",
+				"type": "datetime2",
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "etl",
+			"table": "Watermark"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

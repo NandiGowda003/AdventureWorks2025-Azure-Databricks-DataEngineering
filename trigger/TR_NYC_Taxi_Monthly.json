@@ -1,0 +1,35 @@
+{
+	"name": "TR_NYC_Taxi_Monthly",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "PL_NYC_Taxi_Incremental",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Month",
+				"interval": 1,
+				"startTime": "2026-09-28T17:37:00",
+				"timeZone": "India Standard Time",
+				"schedule": {
+					"minutes": [
+						0
+					],
+					"hours": [
+						10
+					],
+					"monthDays": [
+						5
+					]
+				}
+			}
+		}
+	}
+}
