@@ -1,0 +1,680 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adf-nyc-taxi-de-kaashi"
+		},
+		"LS_ADLS_AdventureWorks_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'LS_ADLS_AdventureWorks'"
+		},
+		"LS_ADLS_NYC_Taxi_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'LS_ADLS_NYC_Taxi'"
+		},
+		"LS_AzureSQL_Adventutrworks_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_AzureSQL_Adventutrworks'"
+		},
+		"LS_AzureSQL_Control_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_AzureSQL_Control'"
+		},
+		"LS_ADLS_AdventureWorks_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://adventureworkstorageadls.dfs.core.windows.net/"
+		},
+		"LS_ADLS_NYC_Taxi_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://stnyctaxide2026nandi.dfs.core.windows.net/"
+		},
+		"LS_AzureSQL_Adventutrworks_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "adventurework-sql-server.database.windows.net"
+		},
+		"LS_AzureSQL_Adventutrworks_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "free-sql-db-2598144"
+		},
+		"LS_AzureSQL_Adventutrworks_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "avinashcg"
+		},
+		"LS_AzureSQL_Control_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "avinashcg.database.windows.net"
+		},
+		"LS_AzureSQL_Control_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "sqldb-nyc-taxi-control"
+		},
+		"LS_AzureSQL_Control_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "sqllogin"
+		},
+		"LS_HTTP_Frankfurter_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://api.frankfurter.dev"
+		},
+		"LS_HTTP_NYC_TLC_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://d37ci6vzurychx.cloudfront.net"
+		},
+		"LS_REST_Frankfurter_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://api.frankfurter.app/"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_ADLS_AdventureWorks')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('LS_ADLS_AdventureWorks_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('LS_ADLS_AdventureWorks_accountKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_ADLS_NYC_Taxi')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('LS_ADLS_NYC_Taxi_properties_typeProperties_url')]",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "[parameters('LS_ADLS_NYC_Taxi_accountKey')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_AzureDatabricks_NYC_Taxi')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://adb-7405615617588622.2.azuredatabricks.net",
+					"authentication": "MSI",
+					"workspaceResourceId": "/subscriptions/6fc0bc8d-e4c2-47ba-8bcd-0c93d15c0567/resourceGroups/rg-nyc-taxi-de/providers/Microsoft.Databricks/workspaces/dbw-nyc-taxi-de"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_AzureSQL_Adventutrworks')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS_AzureSQL_Adventutrworks_properties_typeProperties_server')]",
+					"database": "[parameters('LS_AzureSQL_Adventutrworks_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": true,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS_AzureSQL_Adventutrworks_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_AzureSQL_Adventutrworks_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_AzureSQL_Control')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('LS_AzureSQL_Control_properties_typeProperties_server')]",
+					"database": "[parameters('LS_AzureSQL_Control_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS_AzureSQL_Control_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_AzureSQL_Control_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_HTTP_Frankfurter')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "HttpServer",
+				"typeProperties": {
+					"url": "[parameters('LS_HTTP_Frankfurter_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_HTTP_NYC_TLC')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "HttpServer",
+				"typeProperties": {
+					"url": "[parameters('LS_HTTP_NYC_TLC_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_REST_Frankfurter')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('LS_REST_Frankfurter_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SHIR-AdventureWorks')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_ADLS_API_Bronze')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ADLS_AdventureWorks",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "frankfurter_usd_inr.json",
+						"folderPath": "API",
+						"fileSystem": "bronze"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_AdventureWorks')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_ADLS_AdventureWorks')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ADLS_AdventureWorks",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"p_parm": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().p_parm",
+							"type": "Expression"
+						},
+						"folderPath": "AdventureWorks2025",
+						"fileSystem": "bronze"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_AdventureWorks')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_ADLS_Bronze_NYC_TLC')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ADLS_NYC_Taxi",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pYear": {
+						"type": "string"
+					},
+					"pMonth": {
+						"type": "string"
+					},
+					"pFileName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@{dataset().pFileName}",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "yellow_taxi/@{dataset().pYear}/@{dataset().pMonth}",
+							"type": "Expression"
+						},
+						"fileSystem": "bronze"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_NYC_Taxi')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_ADLS_Currency_JSON')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ADLS_NYC_Taxi",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "exchange_rates.json",
+						"folderPath": "currency/usd_inr",
+						"fileSystem": "reference"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_ADLS_NYC_Taxi')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_HTTP_Frankfurter')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_HTTP_Frankfurter",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pRelativeUrl": {
+						"type": "string",
+						"defaultValue": "/v2/rates?from=2026-01-01&to=2026-08-05&base=USD&quotes=INR"
+					}
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": {
+							"value": "@dataset().pRelativeUrl",
+							"type": "Expression"
+						}
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_HTTP_Frankfurter')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_HTTP_NYC_TLC_Parquet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_HTTP_NYC_TLC",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"pRelativeUrl": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": {
+							"value": "@dataset().pRelativeUrl",
+							"type": "Expression"
+						}
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_HTTP_NYC_TLC')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_SQL_AdventureWorks')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_AzureSQL_Adventutrworks",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DimProduct"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_AzureSQL_Adventutrworks')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_SQL_IngestionControl')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_AzureSQL_Control",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "ControlID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "SourceSystem",
+						"type": "varchar"
+					},
+					{
+						"name": "DatasetName",
+						"type": "varchar"
+					},
+					{
+						"name": "Year",
+						"type": "smallint",
+						"precision": 5
+					},
+					{
+						"name": "Month",
+						"type": "tinyint",
+						"precision": 3
+					},
+					{
+						"name": "FileName",
+						"type": "varchar"
+					},
+					{
+						"name": "SourceURL",
+						"type": "varchar"
+					},
+					{
+						"name": "Status",
+						"type": "varchar"
+					},
+					{
+						"name": "StartedAt",
+						"type": "datetime2",
+						"scale": 3
+					},
+					{
+						"name": "CompletedAt",
+						"type": "datetime2",
+						"scale": 3
+					},
+					{
+						"name": "RowCount",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "ErrorMessage",
+						"type": "nvarchar"
+					},
+					{
+						"name": "PipelineRunID",
+						"type": "varchar"
+					},
+					{
+						"name": "CreatedAt",
+						"type": "datetime2",
+						"scale": 3
+					},
+					{
+						"name": "UpdatedAt",
+						"type": "datetime2",
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "etl",
+					"table": "IngestionControl"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_AzureSQL_Control')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_SQL_PipelineAudit')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_AzureSQL_Control",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "AuditID",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "PipelineName",
+						"type": "varchar"
+					},
+					{
+						"name": "PipelineRunID",
+						"type": "varchar"
+					},
+					{
+						"name": "SourceSystem",
+						"type": "varchar"
+					},
+					{
+						"name": "DatasetName",
+						"type": "varchar"
+					},
+					{
+						"name": "StartTime",
+						"type": "datetime2",
+						"scale": 3
+					},
+					{
+						"name": "EndTime",
+						"type": "datetime2",
+						"scale": 3
+					},
+					{
+						"name": "Status",
+						"type": "varchar"
+					},
+					{
+						"name": "RecordsRead",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "RecordsWritten",
+						"type": "bigint",
+						"precision": 19
+					},
+					{
+						"name": "ErrorMessage",
+						"type": "nvarchar"
+					},
+					{
+						"name": "TriggerType",
+						"type": "varchar"
+					},
+					{
+						"name": "CreatedAt",
+						"type": "datetime2",
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "etl",
+					"table": "PipelineAudit"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_AzureSQL_Control')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_SQL_Watermark')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_AzureSQL_Control",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "WatermarkID",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "PipelineName",
+						"type": "varchar"
+					},
+					{
+						"name": "DatasetName",
+						"type": "varchar"
+					},
+					{
+						"name": "WatermarkColumn",
+						"type": "varchar"
+					},
+					{
+						"name": "LastProcessedValue",
+						"type": "varchar"
+					},
+					{
+						"name": "UpdatedAt",
+						"type": "datetime2",
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "etl",
+					"table": "Watermark"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_AzureSQL_Control')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_REST_Frankfurter')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_REST_Frankfurter",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {
+					"relativeUrl": {
+						"value": "latest?from=USD&to=INR",
+						"type": "Expression"
+					}
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_REST_Frankfurter')]"
+			]
+		}
+	]
+}
