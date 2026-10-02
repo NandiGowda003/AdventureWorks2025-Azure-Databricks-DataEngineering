@@ -11,7 +11,7 @@
 			"trustServerCertificate": true,
 			"authenticationType": "SQL",
 			"userName": "avinashcg",
-			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJlY2NhYjAyMy0wOTFmLTQ5NjAtOGYzNC00ZWU4NTZmZmRhYjciLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+			"encryptedCredential": "......"
 		},
 		"connectVia": {
 			"referenceName": "SHIR-AdventureWorks",
