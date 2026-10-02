@@ -2,12 +2,17 @@ name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
+      - develop
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
+      - develop
 
 jobs:
   validate:
+    name: Validate Project Structure
     runs-on: ubuntu-latest
 
     steps:
@@ -16,6 +21,8 @@ jobs:
 
       - name: Validate repository structure
         run: |
+          echo "Checking project directories..."
+
           test -d dataset
           test -d factory
           test -d integrationRuntime
@@ -27,13 +34,45 @@ jobs:
           test -d api
           test -d powerbi
           test -d docs
-          test -f README.md
 
-      - name: Validate project metadata
+          echo "All required directories exist."
+
+      - name: Validate required files
         run: |
+          echo "Checking required project files..."
+
+          test -f README.md
           test -f sql/metadata/ETL_Metadata.sql
           test -f api/frankfurter/README.md
           test -f powerbi/README.md
 
+          echo "All required files exist."
+
+      - name: Validate Databricks project
+        run: |
+          echo "Checking Databricks artifacts..."
+
+          test -d databricks/notebooks
+          test -d databricks/jobs
+
+          echo "Databricks structure validated."
+
+      - name: Validate ADF artifacts
+        run: |
+          echo "Checking ADF artifacts..."
+
+          test -d dataset
+          test -d factory
+          test -d integrationRuntime
+          test -d linkedService
+          test -d pipeline
+          test -d trigger
+
+          echo "ADF structure validated."
+
       - name: CI validation successful
-        run: echo "AdventureWorks project structure validated successfully."
+        run: |
+          echo "----------------------------------------"
+          echo "AdventureWorks project CI validation"
+          echo "passed successfully."
+          echo "----------------------------------------"
