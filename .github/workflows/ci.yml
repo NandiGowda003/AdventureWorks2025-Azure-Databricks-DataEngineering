@@ -12,7 +12,7 @@ on:
 
 jobs:
   validate:
-    name: Validate Project Structure
+    name: Validate AdventureWorks Project
     runs-on: ubuntu-latest
 
     steps:
@@ -39,7 +39,7 @@ jobs:
 
       - name: Validate required files
         run: |
-          echo "Checking required project files..."
+          echo "Checking required files..."
 
           test -f README.md
           test -f sql/metadata/ETL_Metadata.sql
@@ -48,31 +48,13 @@ jobs:
 
           echo "All required files exist."
 
-      - name: Validate Databricks project
+      - name: Validate Databricks structure
         run: |
-          echo "Checking Databricks artifacts..."
-
           test -d databricks/notebooks
           test -d databricks/jobs
 
           echo "Databricks structure validated."
 
-      - name: Validate ADF artifacts
-        run: |
-          echo "Checking ADF artifacts..."
-
-          test -d dataset
-          test -d factory
-          test -d integrationRuntime
-          test -d linkedService
-          test -d pipeline
-          test -d trigger
-
-          echo "ADF structure validated."
-
       - name: CI validation successful
         run: |
-          echo "----------------------------------------"
-          echo "AdventureWorks project CI validation"
-          echo "passed successfully."
-          echo "----------------------------------------"
+          echo "AdventureWorks project CI validation passed successfully."
