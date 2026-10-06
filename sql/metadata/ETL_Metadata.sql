@@ -14,3 +14,9 @@ VALUES
 ('DimGeography'),
 ('FactInternetSales');
 GO
+
+-- parameterization in lookup table (ADF pipeline)
+SELECT TableName
+FROM dbo.ETL_Metadata
+WHERE IsActive = 1
+ORDER BY ID;
